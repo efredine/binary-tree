@@ -346,10 +346,6 @@ impl<T: Ord> IntoIterator for BinaryTree<T> {
     }
 }
 
-pub fn values<T: Ord + Clone>(tree: &BinaryTree<T>) -> Vec<T> {
-    tree.iter().cloned().collect()
-}
-
 pub fn insert_all<T: Ord + Clone>(tree: &mut BinaryTree<T>, values: &[T]) {
     for value in values {
         tree.insert(value.clone());
@@ -390,7 +386,7 @@ mod tests {
             results,
             vec![true, true, true, true, true, true, true, false, false]
         );
-        assert_eq!(values(&tree), [1, 3, 4, 5, 6, 7, 8]);
+        assert!(tree.iter().cloned().eq([1, 3, 4, 5, 6, 7, 8]));
     }
 
     #[test]
@@ -402,7 +398,7 @@ mod tests {
             results.push(node);
         }
         assert_eq!(results, vec![&3, &5, &7]);
-        assert_eq!(values(&tree), vec![3, 5, 7]);
+        assert!(tree.iter().cloned().eq(vec![3, 5, 7]));
     }
 
     #[test]
@@ -420,19 +416,19 @@ mod tests {
     fn test_remove() {
         let mut tree = BinaryTree::<i32>::new();
         insert_all(&mut tree, &[5, 3, 7, 1, 4, 6, 8]);
-        assert_eq!(values(&tree), vec![1, 3, 4, 5, 6, 7, 8]);
+        assert!(tree.iter().cloned().eq(vec![1, 3, 4, 5, 6, 7, 8]));
 
         // Remove a value and check if it's deleted correctly
         assert!(tree.remove(3));
-        assert_eq!(values(&tree), vec![1, 4, 5, 6, 7, 8]);
+        assert!(tree.iter().cloned().eq(vec![1, 4, 5, 6, 7, 8]));
 
         // Remove another value and check if it's deleted correctly
         assert!(tree.remove(7));
-        assert_eq!(values(&tree), vec![1, 4, 5, 6, 8]);
+        assert!(tree.iter().cloned().eq(vec![1, 4, 5, 6, 8]));
 
         // Remove a value that doesn't exist and check if the tree remains the same
         assert!(!tree.remove(10));
-        assert_eq!(values(&tree), vec![1, 4, 5, 6, 8]);
+        assert!(tree.iter().cloned().eq(vec![1, 4, 5, 6, 8]));
     }
 
     #[test]
@@ -445,11 +441,11 @@ mod tests {
         for value in initial_values.clone() {
             assert!(tree.remove(value));
             initial_values.retain(|&v| v != value);
-            assert_eq!(values(&tree), initial_values);
+            assert!(&tree.iter().eq(&initial_values));
         }
 
         // At this point, all values should have been deleted from the tree
-        assert!(values(&tree).is_empty());
+        assert!(tree.iter().next().is_none());
     }
 
     #[test]
@@ -458,10 +454,8 @@ mod tests {
         insert_all(&mut tree, &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
         assert_eq!((13, 12, false), tree.shape());
         tree.balance();
-        assert_eq!(
-            values(&tree),
-            vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-        );
+        assert!(
+            &tree.iter().cloned().eq(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]));
         assert_eq!((13, 3, true), tree.shape());
         assert_eq!(tree.depth(), 3);
     }
@@ -483,9 +477,8 @@ mod tests {
         );
         assert_eq!((7, 6, false), tree.shape());
         tree.balance();
-        assert_eq!(
-            values(&tree),
-            vec![
+        assert!(
+            tree.iter().cloned().eq(vec![
                 "Apple",
                 "Banana",
                 "Cherry",
@@ -493,7 +486,7 @@ mod tests {
                 "Elderberry",
                 "Fig",
                 "Grape",
-            ]
+            ])
         );
         assert_eq!((7, 2, true), tree.shape());
         assert_eq!(tree.depth(), 2);
