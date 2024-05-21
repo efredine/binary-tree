@@ -86,6 +86,11 @@ impl<T: Ord> BinaryTree<T> {
         depth
     }
 
+    /// Return the size, depth, and whether the binary tree is route balanced.
+    ///
+    /// A binary tree is route balanced if the depth of the tree is less than or equal to the
+    /// maximum depth of a binary tree with the same number of nodes and every level except the
+    /// last is completely filled.
     pub fn shape(&self) -> (usize, usize, bool) {
         let mut depth: usize = 0;
         let mut size: usize = 0;
@@ -104,6 +109,11 @@ impl<T: Ord> BinaryTree<T> {
         (size, depth, route_balanced)
     }
 
+    /// Balance the binary tree using the [Day-Stout-Warren algorithm](https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm)
+    ///
+    /// The algorithm first converts the binary tree into a vine (a degenerate tree) by rotating nodes in place.
+    /// It then compresses the vine by rotating nodes in place to form a balanced tree.
+    ///
     pub fn balance(&mut self) {
         let mut size = self.tree_to_vine();
         let power = ((size + 1) as f64).log2().floor() as usize;
@@ -253,6 +263,11 @@ impl<T: Ord + Display> BinaryTree<T> {
             }
             println!("{}", node.value);
         });
+        let (size, depth, route_balanced) = self.shape();
+        println!(
+            "Size: {}, Depth: {}, Route Balanced: {}\n",
+            size, depth, route_balanced
+        );
     }
 }
 
