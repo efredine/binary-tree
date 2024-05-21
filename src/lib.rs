@@ -64,6 +64,10 @@ impl<T: Ord> BinaryTree<T> {
         iter
     }
 
+    pub fn len(&self) -> usize {
+        self.iter().count()
+    }
+
     pub fn visit_in_order<F>(&self, mut f: F)
         where
             F: FnMut(&Box<TreeNode<T>>, usize),
@@ -356,6 +360,20 @@ impl<T: Ord> FromIterator<T> for BinaryTree<T> {
     }
 }
 
+impl<T: Ord, const N: usize> From<[T; N]> for BinaryTree<T> {
+    fn from(array: [T; N]) -> Self {
+        Self::from_iter(array)
+    }
+}
+
+impl<T: Ord> PartialEq<Self> for BinaryTree<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.iter().eq(other.iter())
+    }
+}
+
+impl<T: Ord> Eq for BinaryTree<T> {}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -377,6 +395,28 @@ mod tests {
     }
 
     #[test]
+    fn test_len() {
+        let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
+        assert_eq!(tree.len(), 7);
+        let tree: BinaryTree<u8> = BinaryTree::new();
+        assert_eq!(tree.len(), 0);
+    }
+
+    #[test]
+    fn test_eq() {
+        let tree1 = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
+        let tree2 = BinaryTree::from_iter(vec![7, 3, 5, 1, 4, 6, 8]);
+        assert!(tree1.eq(&tree2));
+
+        let tree3 = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6]);
+        assert!(!tree1.eq(&tree3));
+
+        let empty_tree_one: BinaryTree<u8> = BinaryTree::new();
+        let empty_tree_two: BinaryTree<u8> = BinaryTree::new();
+        assert!(empty_tree_one.eq(&empty_tree_two));
+    }
+
+    #[test]
     fn test_insert() {
         let mut tree = BinaryTree::<i32>::new();
         let test_values = [5, 3, 7, 1, 4, 6, 8, 1, 3];
@@ -388,6 +428,18 @@ mod tests {
             results,
             vec![true, true, true, true, true, true, true, false, false]
         );
+        assert!(tree.iter().cloned().eq([1, 3, 4, 5, 6, 7, 8]));
+    }
+
+    #[test]
+    fn test_insert_from_iter_array() {
+        let tree = BinaryTree::from_iter([5, 3, 7, 1, 4, 6, 8]);
+        assert!(tree.iter().cloned().eq([1, 3, 4, 5, 6, 7, 8]));
+    }
+
+    #[test]
+    fn test_insert_from_array() {
+        let tree = BinaryTree::from([5, 3, 7, 1, 4, 6, 8]);
         assert!(tree.iter().cloned().eq([1, 3, 4, 5, 6, 7, 8]));
     }
 
