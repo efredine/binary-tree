@@ -346,9 +346,13 @@ impl<T: Ord> IntoIterator for BinaryTree<T> {
     }
 }
 
-pub fn insert_all<T: Ord + Clone>(tree: &mut BinaryTree<T>, values: &[T]) {
-    for value in values {
-        tree.insert(value.clone());
+impl<T: Ord> FromIterator<T> for BinaryTree<T> {
+    fn from_iter<I: IntoIterator<Item=T>>(iter: I) -> Self {
+        let mut tree = BinaryTree::new();
+        for value in iter {
+            tree.insert(value);
+        }
+        tree
     }
 }
 
@@ -358,8 +362,7 @@ mod tests {
 
     #[test]
     fn test_contains() {
-        let mut tree = BinaryTree::<i32>::new();
-        insert_all(&mut tree, &[5, 3, 7, 1, 4, 6, 8]);
+        let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
         assert!(tree.contains(&3));
         assert!(tree.contains(&7));
         assert!(!tree.contains(&10));
@@ -367,8 +370,7 @@ mod tests {
 
     #[test]
     fn test_get() {
-        let mut tree = BinaryTree::<i32>::new();
-        insert_all(&mut tree, &[5, 3, 7, 1, 4, 6, 8]);
+        let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
         assert_eq!(tree.get(&3), Some(&3));
         assert_eq!(tree.get(&7), Some(&7));
         assert_eq!(tree.get(&10), None);
@@ -391,8 +393,7 @@ mod tests {
 
     #[test]
     fn test_iterable_ref() {
-        let mut tree = BinaryTree::<i32>::new();
-        insert_all(&mut tree, &[5, 3, 7]);
+        let tree = BinaryTree::from_iter(vec![5, 3, 7]);
         let mut results: Vec<&i32> = Vec::new();
         for node in &tree {
             results.push(node);
@@ -403,8 +404,7 @@ mod tests {
 
     #[test]
     fn test_consuming_iterator() {
-        let mut tree = BinaryTree::<i32>::new();
-        insert_all(&mut tree, &[5, 3, 7]);
+        let tree = BinaryTree::from_iter(vec![5, 3, 7]);
         let mut results: Vec<i32> = Vec::new();
         for node in tree {
             results.push(node);
@@ -414,8 +414,7 @@ mod tests {
 
     #[test]
     fn test_remove() {
-        let mut tree = BinaryTree::<i32>::new();
-        insert_all(&mut tree, &[5, 3, 7, 1, 4, 6, 8]);
+        let mut tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
         assert!(tree.iter().cloned().eq(vec![1, 3, 4, 5, 6, 7, 8]));
 
         // Remove a value and check if it's deleted correctly
@@ -433,9 +432,8 @@ mod tests {
 
     #[test]
     fn test_remove_all() {
-        let mut tree = BinaryTree::<i32>::new();
         let mut initial_values = vec![5, 3, 7, 1, 4, 6, 8];
-        insert_all(&mut tree, &initial_values);
+        let mut tree = BinaryTree::from_iter(initial_values.clone());
         initial_values.sort_unstable();
 
         for value in initial_values.clone() {
@@ -450,8 +448,7 @@ mod tests {
 
     #[test]
     fn test_balance_ordered_tree() {
-        let mut tree = BinaryTree::<i32>::default();
-        insert_all(&mut tree, &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+        let mut tree = BinaryTree::from_iter(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
         assert_eq!((13, 12, false), tree.shape());
         tree.balance();
         assert!(
@@ -462,19 +459,15 @@ mod tests {
 
     #[test]
     fn test_balance_reverse_ordered_tree() {
-        let mut tree = BinaryTree::<String>::default();
-        insert_all(
-            &mut tree,
-            &[
-                "Grape".into(),
-                "Fig".into(),
-                "Elderberry".into(),
-                "Date".into(),
-                "Cherry".into(),
-                "Banana".into(),
-                "Apple".into(),
-            ],
-        );
+        let mut tree: BinaryTree<String> = BinaryTree::from_iter(vec![
+            "Grape".into(),
+            "Fig".into(),
+            "Elderberry".into(),
+            "Date".into(),
+            "Cherry".into(),
+            "Banana".into(),
+            "Apple".into(),
+        ]);
         assert_eq!((7, 6, false), tree.shape());
         tree.balance();
         assert!(
