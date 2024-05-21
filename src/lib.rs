@@ -492,7 +492,7 @@ mod tests {
                 "Date",
                 "Elderberry",
                 "Fig",
-                "Grape"
+                "Grape",
             ]
         );
         assert_eq!((7, 2, true), tree.shape());
