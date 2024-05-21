@@ -12,10 +12,10 @@ fn main() {
             inserted += 1;
         }
     }
-    println!("Generated {} random numbers and inserted {}.", random_count, inserted);
+    println!("Generated {} random numbers and inserted {}:", random_count, inserted);
     tree.print();
 
-    println!("\nBalancing the tree...");
+    println!("Balanced:");
     tree.balance();
     tree.print();
 }
