@@ -1,20 +1,13 @@
-# binary-tree
-A simple rust binary-tree implementation.
+# binary-tree Set
 
-It provides a Set like implementation similar to BTreeSet in the standard library, but is implemented with a binary search tree. 
+A simple set implementation in rust using a binary search tree.
+
+It provides a partial implementation of the BTreeSet api in the standard library.
 
 You probably don't want to use this in production, but it's a fun little project to learn about binary trees and rust.
 
-## Features
-- Insertion
-- Deletion
-- Lookup
-- Iterators
-- Pretty printing
-- Manual balancing with an implementation of [Day-Stout-Warren](https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm)
+## Example:
 
-
-Example:
 ```rust
 use binary_tree::BinaryTree;
 
@@ -39,4 +32,74 @@ fn main() {
     tree.print();
 }
 ```
+
 See [examples](examples) for more examples.
+
+## Supported Methods
+
+BTree method support is as follows:
+
+| Method               | Supported |
+|----------------------|----------|
+| append               | ❌ |
+| clear                | ❌|
+| contains             | ✔️|
+| difference           | ❌|
+| extract_if           | ❌|
+| first                | ❌|
+| get                  | ✔️|
+| len                  | ✔️|
+| insert               | ✔️|
+| is_disjoint          | ❌|
+| is_empty             | ❌|
+| is_subset            | ❌|
+| is_superset          | ❌|
+| iter                 | ✔️|
+| last                 | ❌|
+| len                  | ✔️|
+| new                  | ✔️|
+| new_in               | ❌|
+| pop_first            | ❌|
+| pop_last             | ❌|
+| range                | ❌|
+| replace              | ❌|
+| retain               | ❌|
+| split_off            | ❌|
+| symmetric_difference | ❌|
+| take                 | ❌|
+| union                | ❌|
+
+## Supported Traits
+
+BTree supports the following traits:
+
+| Trait                     | Supported |
+|---------------------------|-----------|
+| BitAnd<&BinaryTree<T, A>> | ❌         |
+| BitOr<&BinaryTree<T, A>>  | ❌         |
+| BitXor<&BinaryTree<T, A>> | ❌         |
+| Clone                     | ❌         |
+| Debug                     | ❌         |
+| Default                   | ✔️        |
+| Eq                        | ✔️        |
+| Extend<&'a T>             | ❌         |
+| Extend<T>                 | ❌         |
+| FromIterator<T>           | ✔️        |
+| Hash                      | ❌         |
+| IntoIterator (consuming)  | ✔️        |
+| IntoIterator (reference)  | ✔️        |
+| Ord                       | ❌         |
+| PartialEq                 | ✔️        |
+| PartialOrd                | ❌         |
+| Sub<&BinaryTree<T, A>>    | ❌         |
+
+## Additional Methods
+
+Additional methods include:
+
+- balance: manual balancing with an implementation
+  of [Day-Stout-Warren](https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm)
+- print: print the tree in a human-readable format
+- shape: length, depth and whether it is route balanced
+
+
