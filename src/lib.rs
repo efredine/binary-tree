@@ -1,3 +1,20 @@
+#![warn(missing_docs)]
+//! An ordered set based on a Binary Search Tree.
+//!
+//! The tree can be manually balanced using the `balance` method.
+//!
+//! # Examples
+//!
+//! ```
+//! use binary_tree::BinaryTree;
+//!
+//! let mut tree = BinaryTree::new();
+//! tree.insert(5);
+//! tree.insert(3);
+//! tree.insert(7);
+//! tree.iter().for_each(|node| println!("{}", node));
+//! assert_eq!(tree.len(), 3);
+//! ```
 use std::cmp::max;
 use std::collections::HashMap;
 use std::fmt::Display;
