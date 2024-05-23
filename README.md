@@ -46,7 +46,7 @@ BTree method support is as follows:
 | contains             | ✔️|
 | difference           | ❌|
 | extract_if           | ❌|
-| first                | ❌|
+| first                | ✔️️|
 | get                  | ✔️|
 | len                  | ✔️|
 | insert               | ✔️|
@@ -55,7 +55,7 @@ BTree method support is as follows:
 | is_subset            | ❌|
 | is_superset          | ❌|
 | iter                 | ✔️|
-| last                 | ❌|
+| last                 | ✔️|
 | len                  | ✔️|
 | new                  | ✔️|
 | new_in               | ❌|

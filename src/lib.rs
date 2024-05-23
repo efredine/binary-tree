@@ -71,6 +71,17 @@ impl<T: Ord> BinaryTree<T> {
         depth
     }
 
+    pub fn first(&self) -> Option<&T> {
+        let mut current = self.root.as_deref();
+        while let Some(node) = current {
+            if node.left.is_none() {
+                return Some(&node.value);
+            }
+            current = node.left.as_deref();
+        }
+        None
+    }
+
     pub fn get<Q>(&self, value: &Q) -> Option<&T>
         where
             T: std::borrow::Borrow<Q>,
@@ -106,6 +117,17 @@ impl<T: Ord> BinaryTree<T> {
         let mut iter = TreeIter { nodes: Vec::new() };
         iter.push_left(self.root.as_deref());
         iter
+    }
+
+    pub fn last(&self) -> Option<&T> {
+        let mut current = self.root.as_deref();
+        while let Some(node) = current {
+            if node.right.is_none() {
+                return Some(&node.value);
+            }
+            current = node.right.as_deref();
+        }
+        None
     }
 
     pub fn len(&self) -> usize {
@@ -482,6 +504,13 @@ mod tests {
         assert_eq!(tree.get(&10), None);
     }
 
+    #[test]
+    fn test_first() {
+        let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
+        assert_eq!(tree.first(), Some(&1));
+        let tree: BinaryTree<u8> = BinaryTree::new();
+        assert_eq!(tree.first(), None);
+    }
 
     #[test]
     fn test_insert() {
@@ -529,6 +558,14 @@ mod tests {
             results.push(node);
         }
         assert_eq!(results, vec![3, 5, 7]);
+    }
+
+    #[test]
+    fn test_last() {
+        let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
+        assert_eq!(tree.last(), Some(&8));
+        let tree: BinaryTree<u8> = BinaryTree::new();
+        assert_eq!(tree.last(), None);
     }
 
     #[test]
