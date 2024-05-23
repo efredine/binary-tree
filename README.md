@@ -42,7 +42,7 @@ BTree method support is as follows:
 | Method               | Supported |
 |----------------------|----------|
 | append               | ❌ |
-| clear                | ❌|
+| clear                | ✔️|
 | contains             | ✔️|
 | difference           | ❌|
 | extract_if           | ❌|
@@ -51,7 +51,7 @@ BTree method support is as follows:
 | len                  | ✔️|
 | insert               | ✔️|
 | is_disjoint          | ❌|
-| is_empty             | ❌|
+| is_empty             | ✔️|
 | is_subset            | ❌|
 | is_superset          | ❌|
 | iter                 | ✔️|

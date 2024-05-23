@@ -51,6 +51,10 @@ impl<T: Ord> BinaryTree<T> {
         }
     }
 
+    pub fn clear(&mut self) {
+        self.root = None;
+    }
+
     pub fn contains<Q>(&self, value: &Q) -> bool
         where
             T: std::borrow::Borrow<Q>,
@@ -92,6 +96,10 @@ impl<T: Ord> BinaryTree<T> {
         let (next_root, inserted) = Self::insert_node(self.root.take(), node);
         self.root = Some(next_root);
         inserted
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.root.is_none()
     }
 
     pub fn iter(&self) -> TreeIter<T> {
@@ -433,6 +441,15 @@ mod tests {
         );
         assert_eq!((7, 2, true), tree.shape());
         assert_eq!(tree.depth(), 2);
+    }
+
+    #[test]
+    fn test_clear() {
+        let mut tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
+        assert_eq!(tree.len(), 7);
+        tree.clear();
+        assert_eq!(tree.len(), 0);
+        assert!(tree.is_empty());
     }
 
     #[test]
