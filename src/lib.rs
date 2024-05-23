@@ -380,27 +380,50 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_balance_ordered_tree() {
+        let mut tree = BinaryTree::from_iter(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+        assert_eq!((13, 12, false), tree.shape());
+        tree.balance();
+        assert!(
+            &tree.iter().cloned().eq(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]));
+        assert_eq!((13, 3, true), tree.shape());
+        assert_eq!(tree.depth(), 3);
+    }
+
+    #[test]
+    fn test_balance_reverse_ordered_tree() {
+        let mut tree: BinaryTree<String> = BinaryTree::from_iter(vec![
+            "Grape".into(),
+            "Fig".into(),
+            "Elderberry".into(),
+            "Date".into(),
+            "Cherry".into(),
+            "Banana".into(),
+            "Apple".into(),
+        ]);
+        assert_eq!((7, 6, false), tree.shape());
+        tree.balance();
+        assert!(
+            tree.iter().cloned().eq(vec![
+                "Apple",
+                "Banana",
+                "Cherry",
+                "Date",
+                "Elderberry",
+                "Fig",
+                "Grape",
+            ])
+        );
+        assert_eq!((7, 2, true), tree.shape());
+        assert_eq!(tree.depth(), 2);
+    }
+
+    #[test]
     fn test_contains() {
         let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
         assert!(tree.contains(&3));
         assert!(tree.contains(&7));
         assert!(!tree.contains(&10));
-    }
-
-    #[test]
-    fn test_get() {
-        let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
-        assert_eq!(tree.get(&3), Some(&3));
-        assert_eq!(tree.get(&7), Some(&7));
-        assert_eq!(tree.get(&10), None);
-    }
-
-    #[test]
-    fn test_len() {
-        let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
-        assert_eq!(tree.len(), 7);
-        let tree: BinaryTree<u8> = BinaryTree::new();
-        assert_eq!(tree.len(), 0);
     }
 
     #[test]
@@ -416,6 +439,15 @@ mod tests {
         let empty_tree_two: BinaryTree<u8> = BinaryTree::new();
         assert!(empty_tree_one.eq(&empty_tree_two));
     }
+
+    #[test]
+    fn test_get() {
+        let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
+        assert_eq!(tree.get(&3), Some(&3));
+        assert_eq!(tree.get(&7), Some(&7));
+        assert_eq!(tree.get(&10), None);
+    }
+
 
     #[test]
     fn test_insert() {
@@ -466,6 +498,14 @@ mod tests {
     }
 
     #[test]
+    fn test_len() {
+        let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
+        assert_eq!(tree.len(), 7);
+        let tree: BinaryTree<u8> = BinaryTree::new();
+        assert_eq!(tree.len(), 0);
+    }
+
+    #[test]
     fn test_remove() {
         let mut tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
         assert!(tree.iter().cloned().eq(vec![1, 3, 4, 5, 6, 7, 8]));
@@ -499,42 +539,5 @@ mod tests {
         assert!(tree.iter().next().is_none());
     }
 
-    #[test]
-    fn test_balance_ordered_tree() {
-        let mut tree = BinaryTree::from_iter(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
-        assert_eq!((13, 12, false), tree.shape());
-        tree.balance();
-        assert!(
-            &tree.iter().cloned().eq(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]));
-        assert_eq!((13, 3, true), tree.shape());
-        assert_eq!(tree.depth(), 3);
-    }
 
-    #[test]
-    fn test_balance_reverse_ordered_tree() {
-        let mut tree: BinaryTree<String> = BinaryTree::from_iter(vec![
-            "Grape".into(),
-            "Fig".into(),
-            "Elderberry".into(),
-            "Date".into(),
-            "Cherry".into(),
-            "Banana".into(),
-            "Apple".into(),
-        ]);
-        assert_eq!((7, 6, false), tree.shape());
-        tree.balance();
-        assert!(
-            tree.iter().cloned().eq(vec![
-                "Apple",
-                "Banana",
-                "Cherry",
-                "Date",
-                "Elderberry",
-                "Fig",
-                "Grape",
-            ])
-        );
-        assert_eq!((7, 2, true), tree.shape());
-        assert_eq!(tree.depth(), 2);
-    }
 }
