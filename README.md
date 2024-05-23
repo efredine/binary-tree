@@ -95,11 +95,12 @@ BTree supports the following traits:
 
 ## Additional Methods
 
-Additional methods include:
-
-- balance: manual balancing with an implementation
+- `balance`: manual balancing with an implementation
   of [Day-Stout-Warren](https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm)
-- print: print the tree in a human-readable format
-- shape: length, depth and whether it is route balanced
+- `depth`: the depth of the tree
+- `print`: print the tree in a human-readable format
+- `shape`: length, depth and whether it is route balanced
+- `visit_in_order`: visit the tree in order
+- `visit_in_reverse_order`: visit the tree in reverse order
 
 

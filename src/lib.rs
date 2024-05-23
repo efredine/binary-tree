@@ -17,12 +17,37 @@ impl<T: Ord> BinaryTree<T> {
         BinaryTree { root: None }
     }
 
+    /// Balance the binary tree using the [Day-Stout-Warren algorithm](https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm)
+    ///
+    /// The algorithm first converts the binary tree into a vine (a degenerate tree) by rotating nodes in place.
+    /// It then compresses the vine by rotating nodes in place to form a balanced tree.
+    ///
+    pub fn balance(&mut self) {
+        let mut size = self.tree_to_vine();
+        let power = ((size + 1) as f64).log2().floor() as usize;
+        let leaf_count = size + 1 - (2usize).pow(power as u32);
+        self.compress(leaf_count);
+        size -= leaf_count;
+        while size > 1 {
+            self.compress(size / 2);
+            size /= 2;
+        }
+    }
+
     pub fn contains<Q>(&self, value: &Q) -> bool
         where
             T: std::borrow::Borrow<Q>,
             Q: Ord,
     {
         self.get(value).is_some()
+    }
+
+    pub fn depth(&self) -> usize {
+        let mut depth: usize = 0;
+        self.visit_in_order(|_, level| {
+            depth = max(level, depth);
+        });
+        depth
     }
 
     pub fn get<Q>(&self, value: &Q) -> Option<&T>
@@ -52,12 +77,6 @@ impl<T: Ord> BinaryTree<T> {
         inserted
     }
 
-    pub fn remove(&mut self, value: T) -> bool {
-        let (next_root, removed) = Self::remove_node(self.root.take(), &value);
-        self.root = next_root;
-        removed
-    }
-
     pub fn iter(&self) -> TreeIter<T> {
         let mut iter = TreeIter { nodes: Vec::new() };
         iter.push_left(self.root.as_deref());
@@ -68,26 +87,10 @@ impl<T: Ord> BinaryTree<T> {
         self.iter().count()
     }
 
-    pub fn visit_in_order<F>(&self, mut f: F)
-        where
-            F: FnMut(&Box<TreeNode<T>>, usize),
-    {
-        Self::in_order_traversal(&self.root, &mut f, 0);
-    }
-
-    pub fn visit_in_reverse_order<F>(&self, mut f: F)
-        where
-            F: FnMut(&Box<TreeNode<T>>, usize),
-    {
-        Self::reverse_order_traversal(&self.root, &mut f, 0);
-    }
-
-    pub fn depth(&self) -> usize {
-        let mut depth: usize = 0;
-        self.visit_in_order(|_, level| {
-            depth = max(level, depth);
-        });
-        depth
+    pub fn remove(&mut self, value: T) -> bool {
+        let (next_root, removed) = Self::remove_node(self.root.take(), &value);
+        self.root = next_root;
+        removed
     }
 
     /// Return the size, depth, and whether the binary tree is route balanced.
@@ -113,43 +116,18 @@ impl<T: Ord> BinaryTree<T> {
         (size, depth, route_balanced)
     }
 
-    /// Balance the binary tree using the [Day-Stout-Warren algorithm](https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm)
-    ///
-    /// The algorithm first converts the binary tree into a vine (a degenerate tree) by rotating nodes in place.
-    /// It then compresses the vine by rotating nodes in place to form a balanced tree.
-    ///
-    pub fn balance(&mut self) {
-        let mut size = self.tree_to_vine();
-        let power = ((size + 1) as f64).log2().floor() as usize;
-        let leaf_count = size + 1 - (2usize).pow(power as u32);
-        self.compress(leaf_count);
-        size -= leaf_count;
-        while size > 1 {
-            self.compress(size / 2);
-            size /= 2;
-        }
+    pub fn visit_in_order<F>(&self, mut f: F)
+        where
+            F: FnMut(&Box<TreeNode<T>>, usize),
+    {
+        Self::in_order_traversal(&self.root, &mut f, 0);
     }
 
-    pub fn tree_to_vine(&mut self) -> usize {
-        let mut possible_remainder = self.root.as_deref_mut();
-        let mut size = 0;
-
-        while let Some(remainder) = possible_remainder.take() {
-            if remainder.left.is_none() {
-                possible_remainder = remainder.right.as_deref_mut();
-                size += 1;
-            } else {
-                // Rotate nodes in place by swapping values and updating left and right pointers.
-                let mut left_node = remainder.left.take().unwrap();
-                std::mem::swap(&mut remainder.value, &mut left_node.value);
-                remainder.left = left_node.left.take();
-                left_node.left = left_node.right.take();
-                left_node.right = remainder.right.take();
-                remainder.right = Some(left_node);
-                possible_remainder = Some(remainder);
-            }
-        }
-        size
+    pub fn visit_in_reverse_order<F>(&self, mut f: F)
+        where
+            F: FnMut(&Box<TreeNode<T>>, usize),
+    {
+        Self::reverse_order_traversal(&self.root, &mut f, 0);
     }
 
     fn compress(&mut self, count: usize) {
@@ -168,6 +146,17 @@ impl<T: Ord> BinaryTree<T> {
                     current = node.right.as_deref_mut();
                 }
             }
+        }
+    }
+
+    fn in_order_traversal<F>(node: &Option<Box<TreeNode<T>>>, f: &mut F, level: usize)
+        where
+            F: FnMut(&Box<TreeNode<T>>, usize),
+    {
+        if let Some(ref boxed_node) = node {
+            Self::in_order_traversal(&boxed_node.left, f, level + 1);
+            f(boxed_node, level);
+            Self::in_order_traversal(&boxed_node.right, f, level + 1);
         }
     }
 
@@ -236,17 +225,6 @@ impl<T: Ord> BinaryTree<T> {
         }
     }
 
-    fn in_order_traversal<F>(node: &Option<Box<TreeNode<T>>>, f: &mut F, level: usize)
-        where
-            F: FnMut(&Box<TreeNode<T>>, usize),
-    {
-        if let Some(ref boxed_node) = node {
-            Self::in_order_traversal(&boxed_node.left, f, level + 1);
-            f(boxed_node, level);
-            Self::in_order_traversal(&boxed_node.right, f, level + 1);
-        }
-    }
-
     fn reverse_order_traversal<F>(node: &Option<Box<TreeNode<T>>>, f: &mut F, level: usize)
         where
             F: FnMut(&Box<TreeNode<T>>, usize),
@@ -256,6 +234,28 @@ impl<T: Ord> BinaryTree<T> {
             f(boxed_node, level);
             Self::reverse_order_traversal(&boxed_node.left, f, level + 1);
         }
+    }
+
+    fn tree_to_vine(&mut self) -> usize {
+        let mut possible_remainder = self.root.as_deref_mut();
+        let mut size = 0;
+
+        while let Some(remainder) = possible_remainder.take() {
+            if remainder.left.is_none() {
+                possible_remainder = remainder.right.as_deref_mut();
+                size += 1;
+            } else {
+                // Rotate nodes in place by swapping values and updating left and right pointers.
+                let mut left_node = remainder.left.take().unwrap();
+                std::mem::swap(&mut remainder.value, &mut left_node.value);
+                remainder.left = left_node.left.take();
+                left_node.left = left_node.right.take();
+                left_node.right = remainder.right.take();
+                remainder.right = Some(left_node);
+                possible_remainder = Some(remainder);
+            }
+        }
+        size
     }
 }
 
@@ -278,6 +278,33 @@ impl<T: Ord + Display> BinaryTree<T> {
 impl<T: Ord> Default for BinaryTree<T> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl<T: Ord> Eq for BinaryTree<T> {}
+
+impl<T: Ord, const N: usize> From<[T; N]> for BinaryTree<T> {
+    fn from(array: [T; N]) -> Self {
+        Self::from_iter(array)
+    }
+}
+
+impl<T: Ord> FromIterator<T> for BinaryTree<T> {
+    fn from_iter<I: IntoIterator<Item=T>>(iter: I) -> Self {
+        let mut tree = BinaryTree::new();
+        for value in iter {
+            tree.insert(value);
+        }
+        tree
+    }
+}
+
+impl<'a, T: Ord> IntoIterator for &'a BinaryTree<T> {
+    type Item = &'a T;
+    type IntoIter = TreeIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        BinaryTree::iter(self)
     }
 }
 
@@ -304,12 +331,14 @@ impl<'a, T: Ord> Iterator for TreeIter<'a, T> {
     }
 }
 
-impl<'a, T: Ord> IntoIterator for &'a BinaryTree<T> {
-    type Item = &'a T;
-    type IntoIter = TreeIter<'a, T>;
+impl<T: Ord> IntoIterator for BinaryTree<T> {
+    type Item = T;
+    type IntoIter = TreeIntoIter<T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        BinaryTree::iter(self)
+        let mut iter = TreeIntoIter { nodes: Vec::new() };
+        iter.push_left(self.root);
+        iter
     }
 }
 
@@ -339,40 +368,12 @@ impl<T: Ord> Iterator for TreeIntoIter<T> {
     }
 }
 
-impl<T: Ord> IntoIterator for BinaryTree<T> {
-    type Item = T;
-    type IntoIter = TreeIntoIter<T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        let mut iter = TreeIntoIter { nodes: Vec::new() };
-        iter.push_left(self.root);
-        iter
-    }
-}
-
-impl<T: Ord> FromIterator<T> for BinaryTree<T> {
-    fn from_iter<I: IntoIterator<Item=T>>(iter: I) -> Self {
-        let mut tree = BinaryTree::new();
-        for value in iter {
-            tree.insert(value);
-        }
-        tree
-    }
-}
-
-impl<T: Ord, const N: usize> From<[T; N]> for BinaryTree<T> {
-    fn from(array: [T; N]) -> Self {
-        Self::from_iter(array)
-    }
-}
-
 impl<T: Ord> PartialEq<Self> for BinaryTree<T> {
     fn eq(&self, other: &Self) -> bool {
         self.iter().eq(other.iter())
     }
 }
 
-impl<T: Ord> Eq for BinaryTree<T> {}
 
 #[cfg(test)]
 mod tests {
