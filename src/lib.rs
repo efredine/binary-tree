@@ -497,6 +497,12 @@ mod tests {
     }
 
     #[test]
+    fn test_from_iter() {
+        let tree: BinaryTree<_> = [3, 2, 1].into_iter().map(|x| x * x).collect();
+        assert!(tree.iter().cloned().eq([1, 4, 9]));
+    }
+
+    #[test]
     fn test_get() {
         let tree = BinaryTree::from_iter(vec![5, 3, 7, 1, 4, 6, 8]);
         assert_eq!(tree.get(&3), Some(&3));
@@ -609,6 +615,4 @@ mod tests {
         // At this point, all values should have been deleted from the tree
         assert!(tree.iter().next().is_none());
     }
-
-
 }

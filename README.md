@@ -45,7 +45,6 @@ BTree method support is as follows:
 | clear                | ✔️|
 | contains             | ✔️|
 | difference           | ❌|
-| extract_if           | ❌|
 | first                | ✔️️|
 | get                  | ✔️|
 | len                  | ✔️|
